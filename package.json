@@ -25,15 +25,20 @@
   "homepage": "https://github.com/samayoo7/fitness-workout-tracker-apis#readme",
   "dependencies": {
     "@prisma/client": "^6.5.0",
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.7",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.14.0",
     "nodemon": "^3.1.9",
     "prisma": "^6.5.0",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3"
   }
 }
