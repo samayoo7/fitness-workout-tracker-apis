@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { createOne, findOne } from "@services/dbService";
 import { LoginRequest, RegisterRequest } from "@/types/auth";
-import { ApiResponse } from "@/utils/apiResponse";
-import { createHashedPassword, generateToken, comparePassword } from "@/utils/authUtils";
+import { ApiResponse } from "@utils/apiResponse";
+import { createHashedPassword, generateToken, comparePassword } from "@utils/authUtils";
 
 const authController = {
 	register: async (req: Request<{}, {}, RegisterRequest>, res: Response) => {
@@ -11,7 +11,8 @@ const authController = {
 
 			const existingUser = await findOne('user', { email });
 			if (existingUser) {
-				return ApiResponse.badRequest(res, 'User already exists');
+				ApiResponse.badRequest(res, 'User already exists');
+				return;
 			}
 
 			const hashedPassword = await createHashedPassword(password);
@@ -30,10 +31,10 @@ const authController = {
 				token
 			}
 
-			return ApiResponse.created(res, response, 'User created successfully');
+			ApiResponse.created(res, response, 'User created successfully');
 		} catch (error) {
 			console.error('Error creating user:', error);
-			return ApiResponse.error(res, 'Failed to create user');
+			ApiResponse.error(res, 'Failed to create user');
 		}
 	},
 	login: async (req: Request<{}, {}, LoginRequest>, res: Response) => {
@@ -42,12 +43,14 @@ const authController = {
 
 			const user = await findOne('user', { email });
 			if (!user) {
-				return ApiResponse.badRequest(res, 'User not found');
+				ApiResponse.badRequest(res, 'User not found');
+				return;
 			}
 
 			const isPasswordValid = await comparePassword(password, user.password);
 			if (!isPasswordValid) {
-				return ApiResponse.badRequest(res, 'Invalid password');
+				ApiResponse.badRequest(res, 'Invalid password');
+				return;
 			}
 
 			const token = generateToken(user.id);
@@ -62,10 +65,10 @@ const authController = {
 				token
 			}
 
-			return ApiResponse.success(res, response, 'User logged in successfully');
+			ApiResponse.success(res, response, 'User logged in successfully');
 		} catch (error) {
 			console.error('Error logging in:', error);
-			return ApiResponse.error(res, 'Failed to log in');
+			ApiResponse.error(res, 'Failed to log in');
 		}
 	},
 };

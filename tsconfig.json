@@ -19,7 +19,8 @@
 			"@config/*": ["src/config/*"],
 			"@types/*": ["src/types/*"],
 			"@utils/*": ["src/utils/*"],
-			"@routes/*": ["src/routes/*"]
+			"@routes/*": ["src/routes/*"],
+			"@validators/*": ["src/validators/*"]
 		}
 	},
 	"include": ["src/**/*"],
