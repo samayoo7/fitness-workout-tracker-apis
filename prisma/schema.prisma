@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,22 +8,108 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String            @id @default(uuid())
+  name             String
+  email            String            @unique
+  password         String
+  workoutPlans     WorkoutPlan[]
+  workoutSchedules WorkoutSchedule[]
+  workoutLogs      WorkoutLog[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 model Exercise {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  category    Category
-  muscleGroup MuscleGroup?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  String               @id @default(uuid())
+  name                String               @unique
+  description         String
+  category            Category
+  muscleGroup         MuscleGroup?
+  workoutPlanItems    WorkoutPlanItem[]
+  workoutLogExercises WorkoutLogExercise[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+model WorkoutPlan {
+  id               String            @id @default(uuid())
+  name             String
+  description      String?
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           String
+  items            WorkoutPlanItem[]
+  workoutSchedules WorkoutSchedule[]
+  workoutLogs      WorkoutLog[]
+  isActive         Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model WorkoutPlanItem {
+  id            String      @id @default(uuid())
+  workoutPlan   WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+  workoutPlanId String
+  exercise      Exercise    @relation(fields: [exerciseId], references: [id])
+  exerciseId    String
+  sets          Int
+  repetitions   Int
+  weight        Float // in kg
+  restTime      Int // in seconds
+  notes         String?
+  order         Int         @default(1)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([workoutPlanId, exerciseId, order])
+}
+
+model WorkoutSchedule {
+  id            String      @id @default(uuid())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  workoutPlan   WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+  workoutPlanId String
+  scheduledDate DateTime
+  scheduledTime DateTime?
+  duration      Int? // in minutes
+  isCompleted   Boolean     @default(false)
+  notes         String?
+  workoutLog    WorkoutLog?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model WorkoutLog {
+  id                String               @id @default(uuid())
+  user              User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  workoutPlan       WorkoutPlan          @relation(fields: [workoutPlanId], references: [id])
+  workoutPlanId     String
+  workoutSchedule   WorkoutSchedule?     @relation(fields: [workoutScheduleId], references: [id])
+  workoutScheduleId String?              @unique
+  startTime         DateTime
+  endTime           DateTime?
+  exercises         WorkoutLogExercise[]
+  notes             String?
+  rating            Int? // Optional rating (e.g., 1-5)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+}
+
+model WorkoutLogExercise {
+  id            String     @id @default(uuid())
+  workoutLog    WorkoutLog @relation(fields: [workoutLogId], references: [id], onDelete: Cascade)
+  workoutLogId  String
+  exercise      Exercise   @relation(fields: [exerciseId], references: [id])
+  exerciseId    String
+  setsCompleted Int
+  repsCompleted Int
+  weightUsed    Float // in kg
+  notes         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([workoutLogId, exerciseId])
 }
 
 enum Category {
