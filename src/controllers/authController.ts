@@ -3,6 +3,7 @@ import { createOne, findOne } from "@services/dbService";
 import { LoginRequest, RegisterRequest } from "@/types/auth";
 import { ApiResponse } from "@utils/apiResponse";
 import { createHashedPassword, generateToken, comparePassword } from "@utils/authUtils";
+import { sendMail } from "@/utils/sendMail";
 
 const authController = {
 	register: async (req: Request<{}, {}, RegisterRequest>, res: Response) => {
@@ -18,6 +19,8 @@ const authController = {
 			const hashedPassword = await createHashedPassword(password);
 
 			const user = await createOne('user', { email, name, password: hashedPassword });
+
+			await sendMail(email, name);
 
 			const token = generateToken(user.id);
 
