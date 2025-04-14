@@ -14,7 +14,7 @@ export class ApiResponse {
 		message: string = 'Success',
 		statusCode: number = 200
 	) {
-		return res.status(statusCode).json({
+		res.status(statusCode).json({
 			success: true,
 			message,
 			data,
@@ -31,7 +31,7 @@ export class ApiResponse {
 		statusCode: number = 500,
 		errors?: Record<string, unknown> | string[]
 	) {
-		return res.status(statusCode).json({
+		res.status(statusCode).json({
 			success: false,
 			message,
 			errors,
@@ -43,41 +43,41 @@ export class ApiResponse {
 	 * Created - 201
 	 */
 	static created<T>(res: Response, data?: T, message: string = 'Resource created successfully') {
-		return this.success(res, data, message, 201);
+		this.success(res, data, message, 201);
 	}
 
 	/**
 	 * Bad Request - 400
 	 */
 	static badRequest<T>(res: Response, message: string = 'Bad Request', errors?: Record<string, unknown> | string[]) {
-		return this.error(res, message, 400, errors);
+		this.error(res, message, 400, errors);
 	}
 
 	/**
 	 * Unauthorized - 401
 	 */
 	static unauthorized(res: Response, message: string = 'Unauthorized', errors?: Record<string, unknown> | string[]) {
-		return this.error(res, message, 401, errors);
+		this.error(res, message, 401, errors);
 	}
 
 	/**
 	 * Forbidden - 403
 	 */
 	static forbidden(res: Response, message: string = 'Forbidden', errors?: Record<string, unknown> | string[]) {
-		return this.error(res, message, 403, errors);
+		this.error(res, message, 403, errors);
 	}
 
 	/**
 	 * Not Found - 404
 	 */
 	static notFound(res: Response, message: string = 'Resource not found', errors?: Record<string, unknown> | string[]) {
-		return this.error(res, message, 404, errors);
+		this.error(res, message, 404, errors);
 	}
 
 	/**
 	 * Internal Server Error - 500
 	 */
 	static internalServerError<T>(res: Response, message: string = 'Internal Server Error', errors?: Record<string, unknown> | string[]) {
-		return this.error(res, message, 500, errors);
+		this.error(res, message, 500, errors);
 	}
 }

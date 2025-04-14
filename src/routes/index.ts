@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import workoutRoutes from './workoutRoutes';
+import authRoutes from './authRoutes';
+
+const router = Router();
+
+router.use('/auth', authRoutes);
+router.use('/workoutPlan', workoutRoutes);
+
+export default router;

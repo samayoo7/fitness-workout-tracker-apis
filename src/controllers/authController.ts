@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createOne, findOne } from "@services/dbService";
+import { createOne, findOne } from "@/services/userService";
 import { LoginRequest, RegisterRequest } from "@/types/auth";
 import { ApiResponse } from "@utils/apiResponse";
 import { createHashedPassword, generateToken, comparePassword } from "@utils/authUtils";
@@ -10,7 +10,7 @@ const authController = {
 		try {
 			const { email, name, password } = req.body;
 
-			const existingUser = await findOne('user', { email });
+			const existingUser = await findOne({ email });
 			if (existingUser) {
 				ApiResponse.badRequest(res, 'User already exists');
 				return;
@@ -18,7 +18,7 @@ const authController = {
 
 			const hashedPassword = await createHashedPassword(password);
 
-			const user = await createOne('user', { email, name, password: hashedPassword });
+			const user = await createOne({ email, name, password: hashedPassword });
 
 			await sendMail(email, name);
 
@@ -44,7 +44,7 @@ const authController = {
 		try {
 			const { email, password } = req.body;
 
-			const user = await findOne('user', { email });
+			const user = await findOne({ email });
 			if (!user) {
 				ApiResponse.badRequest(res, 'User not found');
 				return;

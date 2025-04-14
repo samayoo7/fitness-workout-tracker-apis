@@ -20,9 +20,11 @@
 			"@types/*": ["src/types/*"],
 			"@utils/*": ["src/utils/*"],
 			"@routes/*": ["src/routes/*"],
-			"@validators/*": ["src/validators/*"]
-		}
+			"@validators/*": ["src/validators/*"],
+			"@middlewares/*": ["src/middlewares/*"]
+		},
+		"typeRoots": ["./node_modules/@types", "./src/types"]
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "@types/**/*"],
 	"exclude": ["node_modules"]
 }

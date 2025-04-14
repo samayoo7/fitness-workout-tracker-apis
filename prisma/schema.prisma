@@ -12,6 +12,7 @@ model User {
   name             String
   email            String            @unique
   password         String
+  role             UserRole          @default(USER)
   workoutPlans     WorkoutPlan[]
   workoutSchedules WorkoutSchedule[]
   workoutLogs      WorkoutLog[]
@@ -25,6 +26,7 @@ model Exercise {
   description         String
   category            Category
   muscleGroup         MuscleGroup?
+  difficulty          ExerciseDifficulty   @default(MODERATE)
   workoutPlanItems    WorkoutPlanItem[]
   workoutLogExercises WorkoutLogExercise[]
   createdAt           DateTime             @default(now())
@@ -33,7 +35,7 @@ model Exercise {
 
 model WorkoutPlan {
   id               String            @id @default(uuid())
-  name             String
+  name             String            @unique
   description      String?
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId           String
@@ -135,3 +137,15 @@ enum MuscleGroup {
   CALVES
   FULLBODY
 }
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ExerciseDifficulty {
+  BEGINNER
+  MODERATE
+  ADVANCED
+}
+
