@@ -1,9 +1,8 @@
 import { Response, NextFunction, Request } from 'express';
 import { verifyToken } from '@/utils/authUtils';
 import { ApiResponse } from '@/utils/apiResponse';
-import { AuthenticatedRequest } from '@/types/express';
 
-export const authenticateUser = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const token = req.headers.authorization?.split(' ')[1];
 
