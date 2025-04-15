@@ -54,3 +54,9 @@ export const updateOne = async (id: string, data: Partial<UpdateWorkoutPlan>) =>
 		}
 	});
 };
+
+export const deleteOne = async (id: string) => {
+	return await prisma.workoutPlan.delete({
+		where: { id }
+	});
+};
