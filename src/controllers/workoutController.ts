@@ -92,6 +92,23 @@ const workoutController = {
 		} catch (error) {
 			ApiResponse.error(res, 'Failed to get workout plan');
 		}
+	},
+	toggleActive: async (req: Request, res: Response) => {
+		try {
+			const { id } = req.params;
+			const userId = (req as AuthenticatedRequest).userId;
+
+			const workout = await findFirstById(userId, id);
+			if (!workout) {
+				ApiResponse.notFound(res, 'Workout plan not found');
+				return;
+			}
+
+			await updateOne(id, { isActive: !workout.isActive });
+			ApiResponse.success(res, null, 'Workout plan active status toggled successfully');
+		} catch (error) {
+			ApiResponse.error(res, 'Failed to toggle active status');
+		}
 	}
 };
 
