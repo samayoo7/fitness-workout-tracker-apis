@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createOne, findFirstById, findFirstByName, updateOne, deleteOne } from "@/services/workoutService";
+import { createOne, findFirstById, findFirstByName, updateOne, deleteOne, findAll } from "@/services/workoutService";
 import { AuthenticatedRequest } from "@/types/express";
 import { UpdateWorkoutPlan } from "@/types/workout";
 import { ApiResponse } from "@utils/apiResponse";
@@ -66,6 +66,31 @@ const workoutController = {
 			ApiResponse.success(res, null, 'Workout plan deleted successfully');
 		} catch (error) {
 			ApiResponse.error(res, 'Failed to delete workout plan');
+		}
+	},
+	getAllWorkouts: async (req: Request, res: Response) => {
+		try {
+			const userId = (req as AuthenticatedRequest).userId;
+			const workouts = await findAll(userId);
+			ApiResponse.success(res, workouts, 'Workouts fetched successfully');
+		} catch (error) {
+			ApiResponse.error(res, 'Failed to get all workouts');
+		}
+	},
+	getWorkout: async (req: Request, res: Response) => {
+		try {
+			const { id } = req.params;
+			const userId = (req as AuthenticatedRequest).userId;
+
+			const workout = await findFirstById(userId, id);
+			if (!workout) {
+				ApiResponse.notFound(res, 'Workout plan not found');
+				return;
+			}
+
+			ApiResponse.success(res, workout, 'Workout plan fetched successfully');
+		} catch (error) {
+			ApiResponse.error(res, 'Failed to get workout plan');
 		}
 	}
 };

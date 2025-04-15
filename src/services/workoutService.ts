@@ -31,6 +31,9 @@ export const findFirstById = async (userId: string, id: string) => {
 		where: {
 			id,
 			userId
+		},
+		include: {
+			items: true
 		}
 	});
 };
@@ -58,5 +61,14 @@ export const updateOne = async (id: string, data: Partial<UpdateWorkoutPlan>) =>
 export const deleteOne = async (id: string) => {
 	return await prisma.workoutPlan.delete({
 		where: { id }
+	});
+};
+
+export const findAll = async (userId: string) => {
+	return await prisma.workoutPlan.findMany({
+		where: { userId, isActive: true },
+		include: {
+			items: true
+		}
 	});
 };

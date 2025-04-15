@@ -9,5 +9,7 @@ const router = Router();
 router.post('/', authenticateUser, validateWorkoutPlan, handleValidationErrors, workoutController.createWorkout);
 router.put('/:id', authenticateUser, validateWorkoutPlan, handleValidationErrors, workoutController.updateWorkout);
 router.delete('/:id', authenticateUser, workoutController.deleteWorkout);
+router.get('/', authenticateUser, workoutController.getAllWorkouts);
+router.get('/:id', authenticateUser, workoutController.getWorkout);
 
 export default router;
