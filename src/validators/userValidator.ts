@@ -1,6 +1,4 @@
-import { Request, Response, NextFunction } from "express";
-import { body, validationResult } from "express-validator";
-import { ApiResponse } from "@/utils/apiResponse";
+import { body } from "express-validator";
 
 export const validateUser = [
 	body("name")
@@ -31,11 +29,3 @@ export const validateLogin = [
 		.notEmpty().withMessage("Password is required")
 ];
 
-export const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
-	const errors = validationResult(req);
-	if (!errors.isEmpty()) {
-		ApiResponse.badRequest(res, 'Validation error', errors.array().map(error => error.msg));
-		return;
-	}
-	next();
-};

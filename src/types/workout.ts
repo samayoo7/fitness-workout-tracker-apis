@@ -12,5 +12,9 @@ export interface CreateWorkoutPlan {
 	name: string;
 	description?: string;
 	items: WorkoutPlanItem[];
-	userId: string;
+	userId?: string;
+}
+
+export interface UpdateWorkoutPlan extends CreateWorkoutPlan {
+	isActive?: boolean;
 }
