@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createWorkoutSchedule } from "@services/workoutScheduleService";
+import { createWorkoutSchedule, findExistingWorkoutSchedule } from "@services/workoutScheduleService";
 import { AuthenticatedRequest } from "@/types/express";
 import { ApiResponse } from "@utils/apiResponse";
 
@@ -8,6 +8,11 @@ export const workoutScheduleController = {
 		try {
 			const { workoutPlanId, scheduledDate, scheduledTime, duration, notes } = req.body;
 			const userId = (req as AuthenticatedRequest).userId;
+
+			const existingWorkoutSchedule = await findExistingWorkoutSchedule(userId, scheduledDate);
+			if (existingWorkoutSchedule) {
+				return ApiResponse.error(res, 'Workout schedule already exists for the given time');
+			}
 
 			const workoutSchedule = await createWorkoutSchedule({
 				workoutPlanId,
@@ -18,7 +23,9 @@ export const workoutScheduleController = {
 				userId
 			});
 
-			ApiResponse.success(res, workoutSchedule, 'Workout schedule created successfully');
+			const { userId: _, workoutPlanId: __,  ...workoutScheduleData } = workoutSchedule;
+
+			ApiResponse.success(res, workoutScheduleData, 'Workout schedule created successfully');
 		} catch (error) {
 			ApiResponse.error(res, 'Failed to create workout schedule');
 		}
