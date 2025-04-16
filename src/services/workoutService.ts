@@ -69,6 +69,9 @@ export const findAll = async (userId: string) => {
 		where: { userId, isActive: true },
 		include: {
 			items: true
+		},
+		orderBy: {
+			createdAt: 'desc'
 		}
 	});
 };
