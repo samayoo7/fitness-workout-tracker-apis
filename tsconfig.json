@@ -21,7 +21,8 @@
 			"@utils/*": ["src/utils/*"],
 			"@routes/*": ["src/routes/*"],
 			"@validators/*": ["src/validators/*"],
-			"@middlewares/*": ["src/middlewares/*"]
+			"@middlewares/*": ["src/middlewares/*"],
+			"@jobs/*": ["src/jobs/*"]
 		},
 		"typeRoots": ["./node_modules/@types", "./src/types"]
 	},

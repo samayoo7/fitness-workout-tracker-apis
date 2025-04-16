@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
 import { createOne, findOne } from "@/services/userService";
-import { LoginRequest, RegisterRequest } from "@/types/auth";
 import { ApiResponse } from "@utils/apiResponse";
 import { createHashedPassword, generateToken, comparePassword } from "@utils/authUtils";
-import { sendMail } from "@/utils/sendMail";
+import { sendMail } from "@utils/sendMail";
 
 const authController = {
-	register: async (req: Request<{}, {}, RegisterRequest>, res: Response) => {
+	register: async (req: Request, res: Response) => {
 		try {
 			const { email, name, password } = req.body;
 
@@ -40,7 +39,7 @@ const authController = {
 			ApiResponse.error(res, 'Failed to create user');
 		}
 	},
-	login: async (req: Request<{}, {}, LoginRequest>, res: Response) => {
+	login: async (req: Request, res: Response) => {
 		try {
 			const { email, password } = req.body;
 

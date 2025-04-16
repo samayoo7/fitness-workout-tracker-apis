@@ -1,6 +1,6 @@
 import { Response, NextFunction, Request } from 'express';
-import { verifyToken } from '@/utils/authUtils';
-import { ApiResponse } from '@/utils/apiResponse';
+import { verifyToken } from '@utils/authUtils';
+import { ApiResponse } from '@utils/apiResponse';
 
 export const authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
 	try {

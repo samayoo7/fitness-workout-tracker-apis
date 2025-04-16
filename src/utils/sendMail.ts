@@ -1,6 +1,15 @@
 import nodemailer from 'nodemailer';
 
-export const sendMail = async (to: string, name: string) => {
+interface EmailOptions {
+	subject?: string;
+	customMessage?: string;
+}
+
+export const sendMail = async (
+	to: string, 
+	name: string,
+	options: EmailOptions = {}
+) => {
 	const transporter = nodemailer.createTransport({
 		service: 'gmail',
 		auth: {
@@ -9,16 +18,33 @@ export const sendMail = async (to: string, name: string) => {
 		},
 	});
 
+	const defaultMessage = `
+		<h2>Welcome to Fitness Workout Tracker!</h2>
+		<p>Hi ${name},</p>
+		<p>Thank you for joining Fitness Workout Tracker! Your account has been successfully created and you're now ready to start your fitness journey.</p>
+		<p>With our app, you can:</p>
+		<ul>
+			<li>Create personalized workout plans</li>
+			<li>Track your progress over time</li>
+			<li>Schedule your workouts</li>
+			<li>Access a library of exercises</li>
+		</ul>
+		<p>Get started by logging in to your account and creating your first workout plan!</p>
+		<p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+		<p>Stay strong and keep pushing!</p>
+		<p>The Fitness Workout Tracker Team</p>
+	`;
+
 	const mailOptions = {
 		from: process.env.EMAIL_USER,
 		to,
-		subject: 'Welcome to Fitness Workout Tracker',
+		subject: options.subject || 'Welcome to Fitness Workout Tracker',
 		html: `<!DOCTYPE html>
 			<html>
 			<head>
 			<meta charset="utf-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<title>Welcome to Fitness Workout Tracker</title>
+			<title>${options.subject || 'Welcome to Fitness Workout Tracker'}</title>
 			<style>
 				body {
 				font-family: 'Arial', sans-serif;
@@ -73,23 +99,9 @@ export const sendMail = async (to: string, name: string) => {
 			<div class="container">
 				<div class="header">
 				<div class="logo">🏋️‍♂️ Fitness Workout Tracker</div>
-				<p>YOUR FITNESS JOURNEY STARTS HERE</p>
 				</div>
 				<div class="content">
-				<h2>Welcome to Fitness Workout Tracker!</h2>
-				<p>Hi ${name},</p>
-				<p>Thank you for joining Fitness Workout Tracker! Your account has been successfully created and you're now ready to start your fitness journey.</p>
-				<p>With our app, you can:</p>
-				<ul>
-					<li>Create personalized workout plans</li>
-					<li>Track your progress over time</li>
-					<li>Schedule your workouts</li>
-					<li>Access a library of exercises</li>
-				</ul>
-				<p>Get started by logging in to your account and creating your first workout plan!</p>
-				<p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
-				<p>Stay strong and keep pushing!</p>
-				<p>The Fitness Workout Tracker Team</p>
+					${options.customMessage || defaultMessage}
 				</div>
 				<div class="footer">
 				<p>&copy; 2025 Fitness Workout Tracker. All rights reserved.</p>
@@ -102,15 +114,15 @@ export const sendMail = async (to: string, name: string) => {
 			</div>
 			</body>
 			</html>`,
-		text: `Welcome to Fitness Workout Tracker. Your account has been created successfully.`,
+		text: options.customMessage || 'Welcome to Fitness Workout Tracker. Your account has been created successfully.',
 	};
 
 	try {
 		const info = await transporter.sendMail(mailOptions);
-		console.log('Verification email sent:', info.messageId);
+		console.log('Email sent:', info.messageId);
 		return true;
 	} catch (error) {
-		console.error('Error sending verification email:', error);
+		console.error('Error sending email:', error);
 		return false;
 	}
 };

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { createWorkoutSchedule } from "@/services/workoutScheduleService";
+import { createWorkoutSchedule } from "@services/workoutScheduleService";
 import { AuthenticatedRequest } from "@/types/express";
-import { ApiResponse } from "@/utils/apiResponse";
+import { ApiResponse } from "@utils/apiResponse";
 
 export const workoutScheduleController = {
 	create: async (req: Request, res: Response) => {
