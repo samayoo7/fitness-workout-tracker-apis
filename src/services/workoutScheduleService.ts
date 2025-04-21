@@ -57,3 +57,10 @@ export const findAllWorkoutSchedules = async (userId: string) => {
 		},
 	});
 };
+
+export const markWorkoutScheduleAsCompleted = async (id: string) => {
+	return await prisma.workoutSchedule.update({
+		where: { id },
+		data: { isCompleted: true },
+	});
+};

@@ -6,6 +6,7 @@ import {
 	findWorkoutLogById,
 	findWorkoutLogByScheduleId
 } from '@services/workoutLogService';
+import { markWorkoutScheduleAsCompleted } from '@services/workoutScheduleService';
 import { AuthenticatedRequest } from '@/types/express';
 import { ApiResponse } from '@utils/apiResponse';
 
@@ -33,6 +34,10 @@ export const workoutLogController = {
 
 			if (overlappingWorkout) {
 				return ApiResponse.error(res, 'Another workout log exists for this time period');
+			}
+
+			if (workoutScheduleId) {
+				await markWorkoutScheduleAsCompleted(workoutScheduleId);
 			}
 
 			const workoutLog = await createWorkoutLog({
