@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { workoutScheduleController } from "@/controllers/workoutSchedule";
+import { workoutScheduleController } from "@/controllers/workoutScheduleController";
 import { authenticateUser } from "@/middlewares/authMiddleware";
 
 const router = Router();
