@@ -26,7 +26,9 @@
   "homepage": "https://github.com/samayoo7/fitness-workout-tracker-apis#readme",
   "dependencies": {
     "@prisma/client": "^6.5.0",
+    "@types/cors": "^2.8.17",
     "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
     "cron": "^4.3.0",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",

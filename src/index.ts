@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import routes from '@routes/index';
 import { initializeCronJobs } from '@/jobs';
 
@@ -8,8 +9,24 @@ const PORT = process.env.PORT || 5000;
 
 // Declare app
 const app = express();
-
 app.use(express.json());
+
+const corsOptions = {
+	origin: "*",
+	optionsSuccessStatus: 200
+}
+
+// app.use((req, res, next) => {
+// 	console.log(`Request from origin: ${req.headers.origin}`);
+// 	const origin = req.headers.origin;
+
+// 	if (origin && !['http://example.com'].includes(origin)) {
+// 		return ApiResponse.error(res, 'CORS error: Origin not allowed', 403)
+// 	}
+// 	next();
+// });
+
+app.use(cors(corsOptions));
 
 // Declare routes
 app.use('/api', routes);
