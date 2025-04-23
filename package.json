@@ -34,6 +34,7 @@
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "nodemailer": "^6.10.0"
   },
   "devDependencies": {
@@ -47,5 +48,19 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3"
+  },
+  "_moduleAliases": {
+    "@": "dist",
+    "@routes": "dist/routes",
+    "@utils": "dist/utils",
+    "@controllers": "dist/controllers",
+    "@middlewares": "dist/middlewares",
+    "@models": "dist/models",
+    "@interfaces": "dist/interfaces",
+    "@types": "dist/types",
+    "@config": "dist/config",
+    "@services": "dist/services",
+    "@validators": "dist/validators",
+    "@jobs": "dist/jobs"
   }
 }
