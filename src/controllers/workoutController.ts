@@ -62,7 +62,7 @@ const workoutController = {
 				return;
 			}
 
-			await deleteOne(id);
+			await updateOne(id, { isActive: false });
 			ApiResponse.success(res, null, 'Workout plan deleted successfully');
 		} catch (error) {
 			ApiResponse.error(res, 'Failed to delete workout plan');
