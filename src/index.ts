@@ -1,4 +1,6 @@
-import 'module-alias/register';
+import { setupAliases } from './setupAliases';
+setupAliases();
+
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -40,7 +42,18 @@ app.use('/api', routes);
 // Initialize cron jobs
 initializeCronJobs();
 
+// Health check route
+app.get('/health', (_, res) => {
+	res.status(200).json({
+		status: 'OK',
+		message: 'Server is running',
+		timestamp: new Date().toISOString()
+	});
+});
+
 // Start the server
 app.listen(PORT, () => {
-	console.log(`Server started on port ${PORT}`);
+	console.log(`🚀 Server started on port ${PORT}`);
+}).on('error', (err) => {
+	console.error('❌ Server failed to start:', err);
 });
