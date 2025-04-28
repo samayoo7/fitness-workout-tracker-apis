@@ -3,6 +3,7 @@ import { createOne, findOne } from "@/services/userService";
 import { ApiResponse } from "@utils/apiResponse";
 import { createHashedPassword, generateToken, comparePassword } from "@utils/authUtils";
 import { sendMail } from "@utils/sendMail";
+import { CACHE_TTL, cacheUtils } from "@utils/redisCache";
 
 const authController = {
 	register: async (req: Request, res: Response) => {
@@ -43,6 +44,14 @@ const authController = {
 		try {
 			const { email, password } = req.body;
 
+			const cacheKey = `user:${email}`;
+			const cachedUser = await cacheUtils.get(cacheKey);
+			if (cachedUser) {
+				console.log('User found in cache:', cachedUser);
+				ApiResponse.success(res, cachedUser, 'User logged in successfully');
+				return;
+			}
+
 			const user = await findOne({ email });
 			if (!user) {
 				ApiResponse.badRequest(res, 'User not found');
@@ -66,6 +75,8 @@ const authController = {
 				},
 				token
 			}
+
+			await cacheUtils.set(cacheKey, response, CACHE_TTL.AUTH);
 
 			ApiResponse.success(res, response, 'User logged in successfully');
 		} catch (error) {
