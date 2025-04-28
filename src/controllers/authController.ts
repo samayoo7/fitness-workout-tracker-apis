@@ -47,7 +47,6 @@ const authController = {
 			const cacheKey = `user:${email}`;
 			const cachedUser = await cacheUtils.get(cacheKey);
 			if (cachedUser) {
-				console.log('User found in cache:', cachedUser);
 				ApiResponse.success(res, cachedUser, 'User logged in successfully');
 				return;
 			}
