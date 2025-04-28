@@ -3,6 +3,7 @@ import { createOne, findFirstById, findFirstByName, updateOne, deleteOne, findAl
 import { AuthenticatedRequest } from "@/types/express";
 import { UpdateWorkoutPlan } from "@/types/workout";
 import { ApiResponse } from "@utils/apiResponse";
+import { CACHE_TTL, cacheUtils } from "@utils/redisCache";
 
 const workoutController = {
 	createWorkout: async (req: Request, res: Response) => {
@@ -17,6 +18,13 @@ const workoutController = {
 			}
 
 			const newPlan = await createOne(userId, { name, description, items });
+
+			// Clear the all workouts cache since we added a new one
+			try {
+				await cacheUtils.delByPattern(`workout:${userId}:all`);
+			} catch (cacheError) {
+				console.error('Cache clear error:', cacheError);
+			}
 
 			ApiResponse.created(res, newPlan, 'Workout plan created successfully');
 		} catch (error) {
@@ -63,6 +71,17 @@ const workoutController = {
 			}
 
 			await updateOne(id, { isActive: false });
+
+			// Clear both single and list cache
+			try {
+				await Promise.all([
+					cacheUtils.delByPattern(`workout:${userId}:${id}`),
+					cacheUtils.delByPattern(`workout:${userId}:all`)
+				]);
+			} catch (cacheError) {
+				console.error('Cache clear error:', cacheError);
+			}
+
 			ApiResponse.success(res, null, 'Workout plan deleted successfully');
 		} catch (error) {
 			ApiResponse.error(res, 'Failed to delete workout plan');
@@ -72,6 +91,9 @@ const workoutController = {
 		try {
 			const userId = (req as AuthenticatedRequest).userId;
 			const workouts = await findAll(userId);
+
+			await cacheUtils.set(`workout:${userId}:all`, workouts, CACHE_TTL.WORKOUT);
+
 			ApiResponse.success(res, workouts, 'Workouts fetched successfully');
 		} catch (error) {
 			ApiResponse.error(res, 'Failed to get all workouts');
@@ -87,6 +109,8 @@ const workoutController = {
 				ApiResponse.notFound(res, 'Workout plan not found');
 				return;
 			}
+
+			await cacheUtils.set(`workout:${userId}:${id}`, workout, CACHE_TTL.WORKOUT);
 
 			ApiResponse.success(res, workout, 'Workout plan fetched successfully');
 		} catch (error) {
@@ -104,8 +128,19 @@ const workoutController = {
 				return;
 			}
 
-			await updateOne(id, { isActive: !workout.isActive });
-			ApiResponse.success(res, null, 'Workout plan active status toggled successfully');
+			const updatedWorkout = await updateOne(id, { isActive: !workout.isActive });
+
+			// Clear both single and list cache
+			try {
+				await Promise.all([
+					cacheUtils.delByPattern(`workout:${userId}:${id}`),
+					cacheUtils.delByPattern(`workout:${userId}:all`)
+				]);
+			} catch (cacheError) {
+				console.error('Cache clear error:', cacheError);
+			}
+
+			ApiResponse.success(res, updatedWorkout, 'Workout plan active status toggled successfully');
 		} catch (error) {
 			ApiResponse.error(res, 'Failed to toggle active status');
 		}
