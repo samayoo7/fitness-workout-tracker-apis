@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createOne, findFirstById, findFirstByName, updateOne, deleteOne, findAll } from "@/services/workoutService";
+import { createOne, findFirstById, findFirstByName, updateOne, findAll } from "@/services/workoutService";
 import { AuthenticatedRequest } from "@/types/express";
 import { UpdateWorkoutPlan } from "@/types/workout";
 import { ApiResponse } from "@utils/apiResponse";

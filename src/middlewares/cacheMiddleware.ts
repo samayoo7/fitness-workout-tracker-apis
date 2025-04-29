@@ -29,5 +29,31 @@ export const cacheMiddleware = {
 		} catch (error) {
 			next(error);
 		}
+	},
+	cacheWorkoutSchedule: async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const userId = (req as AuthenticatedRequest).userId;
+			const cacheKey = `workoutSchedule:${userId}:${req.params.id || 'all'}`;
+
+			const cachedData = await cacheUtils.get(cacheKey);
+			if (cachedData) {
+				ApiResponse.success(res, cachedData, 'Data retrieved from cache');
+				return;
+			}
+
+			next();
+		}
+		catch (error) {
+			next(error);
+		}
+	},
+	clearWorkoutScheduleCache: async (req: Request, _: Response, next: NextFunction) => {
+		try {
+			const userId = (req as AuthenticatedRequest).userId;
+			await cacheUtils.delByPattern(`workoutSchedule:${userId}:*`);
+			next();
+		} catch (error) {
+			next(error);
+		}
 	}
 };
