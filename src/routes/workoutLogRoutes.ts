@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { workoutLogController } from '@controllers/workoutLogController';
 import { authenticateUser } from '@middlewares/authMiddleware';
+import { cacheMiddleware } from '@middlewares/cacheMiddleware';
 import { validateWorkoutLog } from '@validators/workoutLogValidator';
 import { handleValidationErrors } from '@validators/common';
 
@@ -64,7 +65,7 @@ const router = Router();
  *       400:
  *         description: Invalid request body
  */
-router.post('/', authenticateUser, validateWorkoutLog, handleValidationErrors, workoutLogController.create);
+router.post('/', authenticateUser, validateWorkoutLog, handleValidationErrors, cacheMiddleware.clearWorkoutLogCache, workoutLogController.create);
 
 /**
  * @swagger
@@ -116,7 +117,7 @@ router.post('/', authenticateUser, validateWorkoutLog, handleValidationErrors, w
  *       401:
  *         description: Unauthorized
  */
-router.get('/', authenticateUser, workoutLogController.getAll);
+router.get('/', authenticateUser, cacheMiddleware.cacheWorkoutLog, workoutLogController.getAll);
 
 /**
  * @swagger
@@ -174,6 +175,6 @@ router.get('/', authenticateUser, workoutLogController.getAll);
  *       404:
  *         description: Workout log not found
  */
-router.get('/:id', authenticateUser, workoutLogController.getById);
+router.get('/:id', authenticateUser, cacheMiddleware.cacheWorkoutLog, workoutLogController.getById);
 
 export default router;

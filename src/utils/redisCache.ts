@@ -3,6 +3,7 @@ import redisClient from "@config/redis";
 export const CACHE_TTL = {
 	AUTH: 3600, // 1 hour
 	WORKOUT: 1800, // 30 minutes
+	WORKOUT_LOG: 3600, // 1 hour
 	EXERCISE: 86400, // 24 hours
 	STATS: 300 // 5 minutes
 };

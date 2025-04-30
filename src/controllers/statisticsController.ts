@@ -3,7 +3,7 @@ import { getStatsForPeriod } from "@services/statisticsService";
 import { AuthenticatedRequest } from "@/types/express";
 import { ApiResponse } from "@utils/apiResponse";
 import { getDateRange } from "@utils/date";
-import { CACHE_TTL, cacheUtils } from "@/utils/redisCache";
+import { CACHE_TTL, cacheUtils } from "@utils/redisCache";
 
 // Type guard for validating period parameter
 const isValidPeriod = (period: any): period is 'thisMonth' | 'lastMonth' | 'lastWeek' => {

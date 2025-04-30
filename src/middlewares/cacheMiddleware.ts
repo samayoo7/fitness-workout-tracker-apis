@@ -55,5 +55,31 @@ export const cacheMiddleware = {
 		} catch (error) {
 			next(error);
 		}
+	},
+	cacheWorkoutLog: async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const userId = (req as AuthenticatedRequest).userId;
+			const cacheKey = `workoutLog:${userId}:${req.params.id || 'all'}`;
+
+			const cachedData = await cacheUtils.get(cacheKey);
+			if (cachedData) {
+				ApiResponse.success(res, cachedData, 'Data retrieved from cache');
+				return;
+			}
+
+			next();
+		}
+		catch (error) {
+			next(error);
+		}
+	},
+	clearWorkoutLogCache: async (req: Request, _: Response, next: NextFunction) => {
+		try {
+			const userId = (req as AuthenticatedRequest).userId;
+			await cacheUtils.delByPattern(`workoutLog:${userId}:*`);
+			next();
+		} catch (error) {
+			next(error);
+		}
 	}
 };
