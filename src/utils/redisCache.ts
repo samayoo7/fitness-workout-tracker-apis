@@ -20,7 +20,7 @@ export const cacheUtils = {
 	/**
 	 * Set data in cache
 	 */
-	async set(key: string, data: any, ttl: number = 3600): Promise<void> {
+	async set<T>(key: string, data: T, ttl: number = 3600): Promise<void> {
 		await redisClient.setEx(key, ttl, JSON.stringify(data));
 	},
 

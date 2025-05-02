@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { createOne, findOne } from "@/services/userService";
+import { User } from "@/types/auth";
 import { ApiResponse } from "@utils/apiResponse";
 import { createHashedPassword, generateToken, comparePassword } from "@utils/authUtils";
 import { sendMail } from "@utils/sendMail";
@@ -44,14 +45,39 @@ const authController = {
 		try {
 			const { email, password } = req.body;
 
-			const cacheKey = `user:${email}`;
-			const cachedUser = await cacheUtils.get(cacheKey);
-			if (cachedUser) {
-				ApiResponse.success(res, cachedUser, 'User logged in successfully');
-				return;
+			const userCacheKey = `user:${email}`;
+
+			let user: User | null = null;
+			try {
+				const cachedUserProfile = await cacheUtils.get<User>(userCacheKey);
+				if (cachedUserProfile) {
+					// We still need to get the password from DB for verification
+					user = await findOne({ email });
+				}
+			} catch (cacheError) {
+				console.error('Cache clear error:', cacheError);
 			}
 
-			const user = await findOne({ email });
+			// If not in cache, fetch from database
+			if (!user) {
+				user = await findOne({ email });
+
+				// Cache basic profile info (not the token or password)
+				if (user) {
+					try {
+						const userProfile = {
+							id: user.id,
+							email: user.email,
+							name: user.name,
+							createdAt: user.createdAt
+						};
+						await cacheUtils.set<Partial<User>>(userCacheKey, userProfile, CACHE_TTL.AUTH);
+					} catch (cacheError) {
+						console.error('Failed to cache user profile:', cacheError);
+					}
+				}
+			}
+
 			if (!user) {
 				ApiResponse.badRequest(res, 'User not found');
 				return;
@@ -74,8 +100,6 @@ const authController = {
 				},
 				token
 			}
-
-			await cacheUtils.set(cacheKey, response, CACHE_TTL.AUTH);
 
 			ApiResponse.success(res, response, 'User logged in successfully');
 		} catch (error) {
