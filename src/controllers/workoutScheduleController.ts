@@ -9,6 +9,7 @@ import {
 } from "@services/workoutScheduleService";
 import { AuthenticatedRequest } from "@/types/express";
 import { ApiResponse } from "@utils/apiResponse";
+import { CACHE_TTL, cacheUtils } from "@utils/redisCache";
 
 export const workoutScheduleController = {
 	create: async (req: Request, res: Response) => {
@@ -18,7 +19,8 @@ export const workoutScheduleController = {
 
 			const existingWorkoutSchedule = await findExistingWorkoutSchedule(userId, scheduledDate);
 			if (existingWorkoutSchedule) {
-				return ApiResponse.error(res, 'Workout schedule already exists for the given time');
+				ApiResponse.error(res, 'Workout schedule already exists for the given time');
+				return;
 			}
 
 			const workoutSchedule = await createWorkoutSchedule({
@@ -31,6 +33,12 @@ export const workoutScheduleController = {
 			});
 
 			const { userId: _, workoutPlanId: __, ...workoutScheduleData } = workoutSchedule;
+
+			try {
+				await cacheUtils.delByPattern(`workoutSchedule:${userId}:*`);
+			} catch (cacheError) {
+				console.error('Cache clear error:', cacheError);
+			}
 
 			ApiResponse.success(res, workoutScheduleData, 'Workout schedule created successfully');
 		} catch (error) {
@@ -45,7 +53,8 @@ export const workoutScheduleController = {
 
 			const isWorkoutScheduleExists = await findWorkoutScheduleById(id);
 			if (!isWorkoutScheduleExists) {
-				return ApiResponse.error(res, 'Workout schedule not found');
+				ApiResponse.error(res, 'Workout schedule not found');
+				return;
 			}
 
 			const workoutSchedule = await updateWorkoutSchedule(id, {
@@ -59,6 +68,15 @@ export const workoutScheduleController = {
 
 			const { userId: _, workoutPlanId: __, ...workoutScheduleData } = workoutSchedule;
 
+			try {
+				await Promise.all([
+					cacheUtils.delByPattern(`workoutSchedule:${userId}:${id}`),
+					cacheUtils.delByPattern(`workoutSchedule:${userId}:all`)
+				]);
+			} catch (cacheError) {
+				console.error('Cache clear error:', cacheError);
+			}
+
 			ApiResponse.success(res, workoutScheduleData, 'Workout schedule updated successfully');
 		} catch (error) {
 			ApiResponse.error(res, 'Failed to update workout schedule');
@@ -67,13 +85,24 @@ export const workoutScheduleController = {
 	delete: async (req: Request, res: Response) => {
 		try {
 			const { id } = req.params;
+			const userId = (req as AuthenticatedRequest).userId;
 
 			const isWorkoutScheduleExists = await findWorkoutScheduleById(id);
 			if (!isWorkoutScheduleExists) {
-				return ApiResponse.error(res, 'Workout schedule not found');
+				ApiResponse.error(res, 'Workout schedule not found');
+				return;
 			}
 
 			await deleteWorkoutSchedule(id);
+
+			try {
+				await Promise.all([
+					cacheUtils.delByPattern(`workoutSchedule:${userId}:${id}`),
+					cacheUtils.delByPattern(`workoutSchedule:${userId}:all`)
+				]);
+			} catch (cacheError) {
+				console.error('Cache clear error:', cacheError);
+			}
 
 			ApiResponse.success(res, null, 'Workout schedule deleted successfully');
 		} catch (error) {
@@ -86,6 +115,12 @@ export const workoutScheduleController = {
 
 			const workoutSchedules = await findAllWorkoutSchedules(userId);
 
+			try {
+				await cacheUtils.set(`workoutSchedule:${userId}:all`, workoutSchedules, CACHE_TTL.WORKOUT);
+			} catch (cacheError) {
+				console.error('Cache set error:', cacheError);
+			}
+
 			ApiResponse.success(res, workoutSchedules, 'Workout schedules fetched successfully');
 		} catch (error) {
 			ApiResponse.error(res, 'Failed to get all workout schedules');
@@ -94,13 +129,21 @@ export const workoutScheduleController = {
 	getById: async (req: Request, res: Response) => {
 		try {
 			const { id } = req.params;
+			const userId = (req as AuthenticatedRequest).userId;
 
 			const workoutSchedule = await findWorkoutScheduleById(id);
 			if (!workoutSchedule) {
-				return ApiResponse.error(res, 'Workout schedule not found');
+				ApiResponse.error(res, 'Workout schedule not found');
+				return;
 			}
 
 			const { userId: _, workoutPlanId: __, ...workoutScheduleData } = workoutSchedule;
+
+			try {
+				await cacheUtils.set(`workoutSchedule:${userId}:${id}`, workoutScheduleData, CACHE_TTL.WORKOUT);
+			} catch (cacheError) {
+				console.error('Cache set error:', cacheError);
+			}
 
 			ApiResponse.success(res, workoutScheduleData, 'Workout schedule fetched successfully');
 		} catch (error) {

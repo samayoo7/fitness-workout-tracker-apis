@@ -11,22 +11,30 @@ A comprehensive REST API service for tracking fitness workouts, managing workout
 - 📊 Exercise Tracking
 - 📈 Progress Statistics
 - 📧 Email Notifications for Scheduled Workouts
+- 📚 Swagger API Documentation
+- 💾 Redis Caching for Improved Performance
+- 🐳 Docker Containerization for Easy Deployment
+- 🚀 Docker Compose for Service Orchestration
 
 ## Tech Stack
 
 - **Runtime**: Node.js with TypeScript
 - **Framework**: Express.js
+- **Containerization**: Docker & Docker Compose
 - **Database**: PostgreSQL with Prisma ORM
+- **Caching**: Redis
 - **Authentication**: JWT (JSON Web Tokens)
 - **Validation**: Express Validator
 - **Email Service**: Nodemailer
 - **Scheduling**: Cron Jobs
+- **API Documentation**: Swagger/OpenAPI
+- **Error Handling**: Custom Response Handler
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
-- PostgreSQL
-- npm or yarn
+- Docker Desktop
+- Docker Compose
 
 ## Installation
 
@@ -49,6 +57,7 @@ DATABASE_URL="postgresql://user:password@localhost:5432/fitness_db"
 JWT_SECRET="your-jwt-secret"
 EMAIL_USER=sender_email_id
 EMAIL_PASSWORD=sender_email_app_password
+REDIS_URL="redis://localhost:6379"
 ```
 
 4. Run database migrations:
@@ -56,12 +65,21 @@ EMAIL_PASSWORD=sender_email_app_password
 npx prisma migrate dev
 ```
 
-5. Seed the database (optional):
+5. Seed the database:
 ```bash
 npm run seed
 ```
 
 ## Running the Application
+
+### Start Docker
+```bash
+docker-compose up --build
+```
+
+The application will automatically:
+- Start PostgreSQL database
+- Start Redis cache
 
 ### Development
 ```bash
@@ -73,6 +91,43 @@ npm run dev
 npm run build
 npm start
 ```
+
+### Docker Commands (Just for more information)
+
+#### Basic Commands
+```bash
+# Start all services
+docker-compose up
+
+# Start in detached mode
+docker-compose up -d
+
+# Stop all services
+docker-compose down
+
+# Rebuild and start
+docker-compose up --build
+
+# Stop and remove volumes
+docker-compose down -v
+```
+
+#### Monitoring Commands
+```bash
+# View all logs
+docker-compose logs -f
+
+# View specific service logs
+docker-compose logs -f postgres
+docker-compose logs -f redis
+```
+
+### Docker Container Services
+
+| Service   | Description         | Port  | Purpose                   |
+|-----------|---------------------|-------|---------------------------|
+| postgres  | PostgreSQL Database | 5432  | Database                  |
+| redis     | Redis Cache         | 6379  | Performance optimization  |
 
 ## API Documentation
 

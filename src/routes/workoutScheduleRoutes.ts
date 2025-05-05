@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { workoutScheduleController } from "@controllers/workoutScheduleController";
 import { authenticateUser } from "@middlewares/authMiddleware";
+import { cacheMiddleware } from "@middlewares/cacheMiddleware";
 import { handleValidationErrors } from "@validators/common";
 import { validateWorkoutSchedule } from "@validators/workoutScheduleValidator";
 
@@ -56,7 +57,7 @@ const router = Router();
  *       400:
  *         description: Invalid request body
  */
-router.post('/', authenticateUser, validateWorkoutSchedule, handleValidationErrors, workoutScheduleController.create);
+router.post('/', authenticateUser, validateWorkoutSchedule, handleValidationErrors, cacheMiddleware.clearWorkoutScheduleCache, workoutScheduleController.create);
 
 /**
  * @swagger
@@ -104,7 +105,7 @@ router.post('/', authenticateUser, validateWorkoutSchedule, handleValidationErro
  *       404:
  *         description: Schedule not found
  */
-router.put('/:id', authenticateUser, validateWorkoutSchedule, handleValidationErrors, workoutScheduleController.update);
+router.put('/:id', authenticateUser, validateWorkoutSchedule, handleValidationErrors, cacheMiddleware.clearWorkoutScheduleCache, workoutScheduleController.update);
 
 /**
  * @swagger
@@ -148,7 +149,7 @@ router.put('/:id', authenticateUser, validateWorkoutSchedule, handleValidationEr
  *       401:
  *         description: Unauthorized
  */
-router.get('/', authenticateUser, workoutScheduleController.getAll);
+router.get('/', authenticateUser, cacheMiddleware.cacheWorkoutSchedule, workoutScheduleController.getAll);
 
 /**
  * @swagger
@@ -174,7 +175,7 @@ router.get('/', authenticateUser, workoutScheduleController.getAll);
  *       404:
  *         description: Schedule not found
  */
-router.get('/:id', authenticateUser, workoutScheduleController.getById);
+router.get('/:id', authenticateUser, cacheMiddleware.cacheWorkoutSchedule, workoutScheduleController.getById);
 
 /**
  * @swagger
@@ -200,6 +201,6 @@ router.get('/:id', authenticateUser, workoutScheduleController.getById);
  *       404:
  *         description: Schedule not found
  */
-router.delete('/:id', authenticateUser, workoutScheduleController.delete);
+router.delete('/:id', authenticateUser, cacheMiddleware.clearWorkoutScheduleCache, workoutScheduleController.delete);
 
 export default router;

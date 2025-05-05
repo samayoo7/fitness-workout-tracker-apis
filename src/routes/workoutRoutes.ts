@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import workoutController from '@controllers/workoutController';
 import { authenticateUser } from '@middlewares/authMiddleware';
+import { cacheMiddleware } from '@middlewares/cacheMiddleware';
 import { validateWorkoutPlan } from '@validators/workoutPlanValidator';
 import { handleValidationErrors } from '@validators/common';
 
@@ -60,7 +61,7 @@ const router = Router();
  *       400:
  *         description: Invalid request body
  */
-router.post('/', authenticateUser, validateWorkoutPlan, handleValidationErrors, workoutController.createWorkout);
+router.post('/', authenticateUser, validateWorkoutPlan, handleValidationErrors, cacheMiddleware.clearWorkoutCache, workoutController.createWorkout);
 
 /**
  * @swagger
@@ -110,7 +111,7 @@ router.post('/', authenticateUser, validateWorkoutPlan, handleValidationErrors, 
  *       404:
  *         description: Workout not found
  */
-router.put('/:id', authenticateUser, validateWorkoutPlan, handleValidationErrors, workoutController.updateWorkout);
+router.put('/:id', authenticateUser, validateWorkoutPlan, handleValidationErrors, cacheMiddleware.clearWorkoutCache, workoutController.updateWorkout);
 
 /**
  * @swagger
@@ -154,7 +155,7 @@ router.put('/:id', authenticateUser, validateWorkoutPlan, handleValidationErrors
  *       401:
  *         description: Unauthorized
  */
-router.get('/', authenticateUser, workoutController.getAllWorkouts);
+router.get('/', authenticateUser, cacheMiddleware.cacheWorkout, workoutController.getAllWorkouts);
 
 /**
  * @swagger
@@ -180,7 +181,7 @@ router.get('/', authenticateUser, workoutController.getAllWorkouts);
  *       404:
  *         description: Workout not found
  */
-router.get('/:id', authenticateUser, workoutController.getWorkout);
+router.get('/:id', authenticateUser, cacheMiddleware.cacheWorkout, workoutController.getWorkout);
 
 /**
  * @swagger
@@ -206,7 +207,7 @@ router.get('/:id', authenticateUser, workoutController.getWorkout);
  *       404:
  *         description: Workout not found
  */
-router.patch('/:id/status', authenticateUser, workoutController.toggleActive);
+router.patch('/:id/status', authenticateUser, cacheMiddleware.clearWorkoutCache, workoutController.toggleActive);
 
 /**
  * @swagger
@@ -232,6 +233,6 @@ router.patch('/:id/status', authenticateUser, workoutController.toggleActive);
  *       404:
  *         description: Workout not found
  */
-router.delete('/:id', authenticateUser, workoutController.deleteWorkout);
+router.delete('/:id', authenticateUser, cacheMiddleware.clearWorkoutCache, workoutController.deleteWorkout);
 
 export default router;

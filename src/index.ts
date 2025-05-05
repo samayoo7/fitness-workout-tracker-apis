@@ -8,6 +8,7 @@ import swaggerUi from 'swagger-ui-express';
 import routes from '@routes/index';
 import { initializeCronJobs } from '@/jobs';
 import { specs } from '@config/swagger';
+import { connectRedis } from '@config/redis';
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -50,6 +51,9 @@ app.get('/health', (_, res) => {
 		timestamp: new Date().toISOString()
 	});
 });
+
+// Connect to Redis
+connectRedis();
 
 // Start the server
 app.listen(PORT, () => {
