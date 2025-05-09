@@ -9,6 +9,8 @@ import routes from '@routes/index';
 import { initializeCronJobs } from '@/jobs';
 import { specs } from '@config/swagger';
 import { connectRedis } from '@config/redis';
+import { OpenSearchService } from './services/openSearchService';
+import { opensearchClient } from './config/openSearch';
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -33,6 +35,18 @@ const corsOptions = {
 // });
 
 app.use(cors(corsOptions));
+
+(async () => {
+	try {
+		await new OpenSearchService().initializeIndices();
+		console.log('OpenSearch indices initialized successfully');
+	} catch (error) {
+		console.error('Failed to initialize OpenSearch indices:', error);
+	}
+})();
+
+console.log("OpenSearch endpoint:", opensearchClient.transport.connectionPool.connections[0].url);
+
 
 // Swagger Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));

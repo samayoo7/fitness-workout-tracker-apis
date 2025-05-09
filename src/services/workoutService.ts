@@ -1,8 +1,9 @@
 import prisma from "@config/db";
 import { CreateWorkoutPlan, UpdateWorkoutPlan } from "@/types/workout";
+import { opensearchClient, WORKOUT_PLAN_INDEX } from "@/config/openSearch";
 
 export const createOne = async (userId: string, data: CreateWorkoutPlan) => {
-	return await prisma.workoutPlan.create({ 
+	const workoutPlan = await prisma.workoutPlan.create({ 
 		data: {
 			name: data.name,
 			description: data.description,
@@ -15,6 +16,35 @@ export const createOne = async (userId: string, data: CreateWorkoutPlan) => {
 			items: true
 		}
 	});
+
+	await opensearchClient.index({
+		index: WORKOUT_PLAN_INDEX,
+		id: workoutPlan.id,
+		body: {
+			name: workoutPlan.name,
+			description: workoutPlan.description,
+			userId: workoutPlan.userId,
+			isActive: workoutPlan.isActive,
+			createdAt: workoutPlan.createdAt,
+			exercises: workoutPlan.items.map((item: any) => ({
+				exerciseId: item.exerciseId,
+				sets: item.sets,
+				repetitions: item.repetitions,
+				weight: item.weight,
+				restTime: item.restTime,
+				notes: item.notes,
+				exercise: {
+					name: item.exercise.name,
+					category: item.exercise.category,
+					muscleGroup: item.exercise.muscleGroup,
+					difficulty: item.exercise.difficulty
+				}
+			}))
+
+		}
+	});
+
+	return workoutPlan;
 };
 
 export const findFirstByName = async (userId: string, name: string) => {

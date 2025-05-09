@@ -1,4 +1,5 @@
 import { Category, MuscleGroup, PrismaClient } from '@prisma/client';
+import { EXERCISE_INDEX, opensearchClient } from '../../src/config/openSearch';
 
 const prisma = new PrismaClient();
 
@@ -226,9 +227,25 @@ async function seed() {
 
 		// Insert exercises
 		for (const exercise of exercises) {
-			await prisma.exercise.create({
+			const exe = await prisma.exercise.create({
 				data: exercise
 			});
+
+			await opensearchClient.index({
+				index: EXERCISE_INDEX,
+				id: exe.id,
+				body: {
+					name: exe.name,
+					description: exe.description,
+					category: exe.category,
+					muscleGroup: exe.muscleGroup,
+					difficulty: exe.difficulty,
+					createdAt: exe.createdAt
+				},
+				refresh: 'wait_for'
+			});
+
+			return exe;
 		}
 
 		console.log(`Successfully seeded ${exercises.length} exercises`);

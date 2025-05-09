@@ -4,8 +4,10 @@ import { ApiResponse } from "@utils/apiResponse";
 import { CACHE_TTL, cacheUtils } from "@utils/redisCache";
 
 export const exerciseController = {
-	getAllExercises: async (_: Request, res: Response) => {
+	getAllExercises: async (req: Request, res: Response) => {
 		try {
+			const { search } = req.query;
+
 			const cacheKey = 'exercises:all';
 			const cachedExercises = await cacheUtils.get(cacheKey);
 			if (cachedExercises) {
@@ -13,7 +15,7 @@ export const exerciseController = {
 				return;
 			}
 
-			const exercises = await findAll();
+			const exercises = await findAll(search as string);
 
 			try {
 				await cacheUtils.set('exercises:all', exercises, CACHE_TTL.EXERCISE);
