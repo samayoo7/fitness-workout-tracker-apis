@@ -213,6 +213,66 @@ const exercises = [
 		description: 'A plyometric exercise that combines a squat with an explosive jump.',
 		category: Category.PLYOMETRIC,
 		muscleGroup: MuscleGroup.QUADRICEPS
+	},
+	{
+		name: 'Jump Squats',
+		description: 'A dynamic exercise combining a traditional squat with an explosive jump.',
+		category: Category.PLYOMETRIC,
+		muscleGroup: MuscleGroup.QUADRICEPS
+	},
+	{
+		name: 'Jumping Lunges',
+		description: 'An advanced plyometric exercise alternating legs in a jumping lunge motion.',
+		category: Category.PLYOMETRIC,
+		muscleGroup: MuscleGroup.QUADRICEPS
+	},
+	{
+		name: 'High Jumps',
+		description: 'Vertical jumping exercise to improve explosive power and leg strength.',
+		category: Category.PLYOMETRIC,
+		muscleGroup: MuscleGroup.QUADRICEPS
+	},
+	{
+		name: 'Double Jump Rope',
+		description: 'Advanced jump rope technique where the rope passes under feet twice per jump.',
+		category: Category.CARDIO,
+		muscleGroup: MuscleGroup.CALVES
+	},
+	{
+		name: 'Cross Jump Rope',
+		description: 'Jump rope variation where arms cross during the jump.',
+		category: Category.CARDIO,
+		muscleGroup: MuscleGroup.CALVES
+	},
+	{
+		name: 'Star Jumps',
+		description: 'A jumping exercise where limbs extend outward like a star.',
+		category: Category.CARDIO,
+		muscleGroup: MuscleGroup.FULLBODY
+	},
+	{
+		name: 'Split Jumps',
+		description: 'Explosive jumping exercise alternating between split leg positions.',
+		category: Category.PLYOMETRIC,
+		muscleGroup: MuscleGroup.QUADRICEPS
+	},
+	{
+		name: 'Tuck Jumps',
+		description: 'Vertical jumps bringing knees to chest at the peak.',
+		category: Category.PLYOMETRIC,
+		muscleGroup: MuscleGroup.QUADRICEPS
+	},
+	{
+		name: 'Box Jump Overs',
+		description: 'Jumping over a box from side to side continuously.',
+		category: Category.PLYOMETRIC,
+		muscleGroup: MuscleGroup.QUADRICEPS
+	},
+	{
+		name: 'Depth Jumps',
+		description: 'Stepping off a platform and immediately jumping upward upon landing.',
+		category: Category.PLYOMETRIC,
+		muscleGroup: MuscleGroup.QUADRICEPS
 	}
 ];
 

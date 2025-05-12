@@ -9,6 +9,7 @@ import routes from '@routes/index';
 import { initializeCronJobs } from '@/jobs';
 import { specs } from '@config/swagger';
 import { connectRedis } from '@config/redis';
+import { initializeElasticsearch } from '@services/syncService';
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -51,6 +52,8 @@ app.get('/health', (_, res) => {
 		timestamp: new Date().toISOString()
 	});
 });
+
+initializeElasticsearch();
 
 // Connect to Redis
 connectRedis();

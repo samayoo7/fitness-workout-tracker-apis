@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/samayoo7/fitness-workout-tracker-apis#readme",
   "dependencies": {
+    "@elastic/elasticsearch": "^8.18.2",
     "@prisma/client": "^6.5.0",
     "@types/cors": "^2.8.17",
     "bcrypt": "^5.1.1",
