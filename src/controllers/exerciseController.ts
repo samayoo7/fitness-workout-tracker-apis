@@ -7,11 +7,14 @@ export const exerciseController = {
 	getAllExercises: async (req: Request, res: Response) => {
 		try {
 			const query = req.query.search as string;
-			const filters = req.query.filters as {
-				category?: string;
-				muscleGroup?: string;
-				difficulty?: string;
-			};
+			const page = parseInt(req.query.page as string) || 1;
+			const limit = parseInt(req.query.limit as string) || 10;
+
+			// const filters = req.query.filters as {
+			// 	category?: string;
+			// 	muscleGroup?: string;
+			// 	difficulty?: string;
+			// };
 
 			// const cacheKey = 'exercises:all';
 			// const cachedExercises = await cacheUtils.get(cacheKey);
@@ -20,7 +23,7 @@ export const exerciseController = {
 			// 	return;
 			// }
 
-			const exercises = await findAll(query);
+			const exercises = await findAll(query, page, limit);
 
 			try {
 				await cacheUtils.set('exercises:all', exercises, CACHE_TTL.EXERCISE);

@@ -69,36 +69,44 @@ export const deleteExerciseIndex = async (exerciseId: string) => {
 	});
 };
 
-export const searchExercises = async (query: string, filters?: {
-	category?: string;
-	muscleGroup?: string;
-	difficulty?: string;
-}) => {
+export const searchExercises = async (query: string, page: number = 1,
+	limit: number = 10, filters?: {
+		category?: string;
+		muscleGroup?: string;
+		difficulty?: string;
+	}
+) => {
 	const should = [
 		{ match_phrase: { name: { query, boost: 3, slop: 2 } } },
-		{ match: { 
-			name: { 
-				query,
-				boost: 2,
-				fuzziness: "AUTO",
-				prefix_length: 1,
-				// operator: "or"
-			} 
-		}},
-		{ wildcard: { 
-			name: { 
-				value: `*${query.toLowerCase()}*`,
-				boost: 1.5,
-				case_insensitive: true
-			} 
-		}},
-		{ match: {
-			description: {
-				query,
-				fuzziness: "AUTO",
-				boost: 1
+		{
+			match: {
+				name: {
+					query,
+					boost: 2,
+					fuzziness: "AUTO",
+					prefix_length: 1,
+					// operator: "or"
+				}
 			}
-		}},
+		},
+		{
+			wildcard: {
+				name: {
+					value: `*${query.toLowerCase()}*`,
+					boost: 1.5,
+					case_insensitive: true
+				}
+			}
+		},
+		{
+			match: {
+				description: {
+					query,
+					fuzziness: "AUTO",
+					boost: 1
+				}
+			}
+		},
 		// { match_phrase_prefix: { 
 		// 	name: { 
 		// 		query,
@@ -115,8 +123,12 @@ export const searchExercises = async (query: string, filters?: {
 		if (filters.difficulty) must.push({ term: { difficulty: filters.difficulty } });
 	}
 
+	const from = (page - 1) * limit;
+
 	const response = await client.search({
 		index: EXERCISE_INDEX,
+		from,
+		size: limit,
 		query: {
 			bool: {
 				should,
@@ -124,13 +136,20 @@ export const searchExercises = async (query: string, filters?: {
 				minimum_should_match: 1
 			}
 		},
-		size: 50
 	});
 
-	return response.hits.hits.map(hit => ({
-		...(hit._source as Record<string, unknown>),
-		score: hit._score
-	}));
+	const total = response.hits.total as { value: number };
+
+	return {
+		exercises: response.hits.hits.map(hit => ({
+			...(hit._source as Record<string, unknown>),
+			score: hit._score
+		})),
+		total: total.value,
+		page,
+		limit,
+		pages: Math.ceil(total.value / limit),
+	}
 };
 
 // WorkoutPlan operations
