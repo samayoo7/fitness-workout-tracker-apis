@@ -41,9 +41,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 // Declare routes
 app.use('/api', routes);
 
-// Initialize cron jobs
-initializeCronJobs();
-
 // Health check route
 app.get('/health', (_, res) => {
 	res.status(200).json({
@@ -53,14 +50,21 @@ app.get('/health', (_, res) => {
 	});
 });
 
-initializeElasticsearch();
-
-// Connect to Redis
-connectRedis();
-
 // Start the server
-app.listen(PORT, () => {
-	console.log(`🚀 Server started on port ${PORT}`);
-}).on('error', (err) => {
-	console.error('❌ Server failed to start:', err);
-});
+const startServer = async () => {
+	try {
+		await initializeElasticsearch();
+		await connectRedis();
+		initializeCronJobs();
+
+		app.listen(PORT, () => {
+			console.log(`🚀 Server started on port ${PORT}`);
+			console.log(`📚 API Documentation available at http://localhost:${PORT}/api-docs`);
+		});
+	} catch (error) {
+		console.error('❌ Failed to start server:', error);
+		process.exit(1);
+	}
+};
+
+startServer();
