@@ -90,7 +90,11 @@ const workoutController = {
 	getAllWorkouts: async (req: Request, res: Response) => {
 		try {
 			const userId = (req as AuthenticatedRequest).userId;
-			const workouts = await findAll(userId);
+			const query = req.query.search as string;
+			const page = parseInt(req.query.page as string) || 1;
+			const limit = parseInt(req.query.limit as string) || 10;
+
+			const workouts = await findAll(userId, query, page, limit);
 
 			await cacheUtils.set(`workout:${userId}:all`, workouts, CACHE_TTL.WORKOUT);
 

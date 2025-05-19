@@ -1,5 +1,6 @@
 import prisma from "@config/db";
 import { CreateWorkoutPlan, UpdateWorkoutPlan } from "@/types/workout";
+import { searchWorkoutPlans } from "./elasticsearchService";
 
 export const createOne = async (userId: string, data: CreateWorkoutPlan) => {
 	return await prisma.workoutPlan.create({ 
@@ -64,14 +65,34 @@ export const deleteOne = async (id: string) => {
 	});
 };
 
-export const findAll = async (userId: string) => {
-	return await prisma.workoutPlan.findMany({
-		where: { userId, isActive: true },
-		include: {
-			items: true
-		},
-		orderBy: {
-			createdAt: 'desc'
-		}
-	});
+export const findAll = async (userId: string, query: string, page: number = 1, limit: number = 10) => {
+	if (query) {
+		return await searchWorkoutPlans(query, userId, page, limit);
+	}
+
+	const [workoutPlans, total] = await Promise.all([
+		prisma.workoutPlan.findMany({
+			skip: (page - 1) * limit,
+			take: limit,
+			where: {
+				userId,
+				isActive: true
+			},
+			include: {
+				items: true
+			},
+			orderBy: {
+				createdAt: 'desc'
+			}
+		}),
+		prisma.workoutPlan.count({ where: { userId } })
+	]);
+
+	return {
+		workoutPlans,
+		total,
+		page,
+		limit,
+		totalPages: Math.ceil(total / limit)
+	}
 };
