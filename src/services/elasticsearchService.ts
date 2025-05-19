@@ -176,7 +176,7 @@ export const deleteWorkoutPlanIndex = async (workoutPlanId: string) => {
 	});
 };
 
-export const searchWorkoutPlans = async (query: string, userId?: string) => {
+export const searchWorkoutPlans = async (query: string, userId?: string, page: number = 1, limit: number = 10) => {
 	const should = [
 		{ match: { name: { query, boost: 2 } } },
 		{ match: { description: query } }
@@ -185,8 +185,12 @@ export const searchWorkoutPlans = async (query: string, userId?: string) => {
 	const must: any[] = [];
 	if (userId) must.push({ term: { userId } });
 
+	const from = (page - 1) * limit;
+
 	const response = await client.search({
 		index: WORKOUT_PLAN_INDEX,
+		from,
+		size: limit,
 		query: {
 			bool: {
 				should,
@@ -196,8 +200,16 @@ export const searchWorkoutPlans = async (query: string, userId?: string) => {
 		}
 	});
 
-	return response.hits.hits.map(hit => ({
-		...(hit._source as Record<string, unknown>),
-		score: hit._score
-	}));
+	const total = response.hits.total as { value: number };
+
+	return {
+		workoutPlans: response.hits.hits.map(hit => ({
+			...(hit._source as Record<string, unknown>),
+			score: hit._score
+		})),
+		total: total.value,
+		page,
+		limit,
+		pages: Math.ceil(total.value / limit),
+	}
 };
