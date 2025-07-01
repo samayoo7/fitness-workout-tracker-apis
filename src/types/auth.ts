@@ -2,6 +2,7 @@ export interface RegisterRequest {
 	name: string;
 	email: string;
 	password: string;
+	profilePhoto?: string;
 }
 
 export interface LoginRequest {

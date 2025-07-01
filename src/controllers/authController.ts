@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import fs from 'fs';
 import { createOne, findOne } from "@/services/userService";
 import { User } from "@/types/auth";
 import { ApiResponse } from "@utils/apiResponse";
@@ -13,13 +14,21 @@ const authController = {
 
 			const existingUser = await findOne({ email });
 			if (existingUser) {
+				if (req.file) {
+					fs.unlinkSync(req.file.path);
+				}
 				ApiResponse.badRequest(res, 'User already exists');
 				return;
 			}
 
 			const hashedPassword = await createHashedPassword(password);
 
-			const user = await createOne({ email, name, password: hashedPassword });
+			const user = await createOne({
+				email,
+				name,
+				password: hashedPassword,
+				profilePhoto: req.file?.path
+			});
 
 			await sendMail(email, name);
 
@@ -30,6 +39,7 @@ const authController = {
 					id: user.id,
 					email: user.email,
 					name: user.name,
+					profilePhoto: user.profilePhoto,
 					createdAt: user.createdAt
 				},
 				token
@@ -38,6 +48,9 @@ const authController = {
 			ApiResponse.created(res, response, 'User created successfully');
 		} catch (error) {
 			console.error('Error creating user:', error);
+			if (req.file) {
+				fs.unlinkSync(req.file.path);
+			}
 			ApiResponse.error(res, 'Failed to create user');
 		}
 	},
@@ -47,7 +60,7 @@ const authController = {
 
 			const userCacheKey = `user:${email}`;
 
-			let user: User | null = null;
+			let user: any = null;
 			try {
 				const cachedUserProfile = await cacheUtils.get<User>(userCacheKey);
 				if (cachedUserProfile) {
@@ -69,6 +82,7 @@ const authController = {
 							id: user.id,
 							email: user.email,
 							name: user.name,
+							profilePhoto: user.profilePhoto,
 							createdAt: user.createdAt
 						};
 						await cacheUtils.set<Partial<User>>(userCacheKey, userProfile, CACHE_TTL.AUTH);
@@ -96,6 +110,7 @@ const authController = {
 					id: user.id,
 					email: user.email,
 					name: user.name,
+					profilePhoto: user.profilePhoto,
 					createdAt: user.createdAt
 				},
 				token

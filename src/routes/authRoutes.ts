@@ -2,6 +2,7 @@ import { Router } from 'express';
 import authController from '@controllers/authController';
 import { validateUser, validateLogin } from '@validators/userValidator';
 import { handleValidationErrors } from '@validators/common';
+import { uploadProfilePhoto } from '@middlewares/uploadMiddleware';
 
 const router = Router();
 
@@ -71,7 +72,7 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post('/register', validateUser, handleValidationErrors, authController.register);
+router.post('/register', uploadProfilePhoto, validateUser, handleValidationErrors, authController.register);
 
 /**
  * @swagger
